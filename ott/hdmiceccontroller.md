@@ -138,3 +138,148 @@ Match content:
 * input: video data. (4k@60 RGB  4k60 YUV 4.2.0) 
 1. if I can only pick my timing, 
 4k30 4:2:2
+
+```
+{
+    "$id": "http://vizio.com/platform/v1.0/hdmi/sink_connected",
+    "$schema": "https://json-schema.org/draft/2020-12/schema",
+    "description": "Notified when a valid HDMI sink is identified and its EDID is parsed.",
+    "type": "object",
+    "properties": {
+        "physicalAddress": {
+          "type": "integer"
+        },
+        "vendorId": {
+          "type": "string"
+        },
+        "hdmiVersion": {
+          "type": "string",
+          "enum": [
+             "HDMI1.4",
+             "HDMI2.0",
+             "HDMI2.1"
+          ]
+        },
+        "portId": {
+          "type": "integer"
+        }
+    },
+    "required": [
+        "physicalAddress",
+        "vendorId",
+        "hdmiVersion",
+        "portId"
+    ],
+    "additionalProperties": false
+}
+```
+```
+{
+    "$id": "http://vizio.com/platform/v1.0/hdmi/sink_disconnected",
+    "$schema": "https://json-schema.org/draft/2020-12/schema",
+    "description": "Notified when the HDMI Sink is disconnected or no longer valid",
+    "type": "object",
+    "properties": {
+        "portId": {
+          "type": "integer"
+        }
+    },
+    "required": [
+        "portId",
+    ],
+    "additionalProperties": false
+}
+```
+```
+{
+    "$id": "http://vizio.com/platform/v1.0/controller/hdmi/cec_message_received",
+    "$schema": "https://json-schema.org/draft/2020-12/schema",
+    "description": "Notified for every valid CEC frame received on the bus",
+    "type": "object",
+    "properties": {
+        "initiator": {
+          "type": "integer",
+          "description": "The logical address of the sender"
+        },
+        "destination": {
+          "type": "integer",
+          "description": "The logical address of the destination (0-15) or 15 for Broadcast"
+        },
+        "opcode": {
+          "type": "integer",
+          "description": "CEC Opcode"
+        },
+        "body": {
+          "type": "string",
+          "description": "The raw parameters/operands associated with the opcode. Empty if the message has no arguments"
+        }
+    },
+    "required": [
+        "initiator",
+        "destination",
+        "opcode",
+        "body"
+    ],
+    "additionalProperties": false
+}
+```
+```
+{
+    "$id": "http://vizio.com/platform/v1.0/controller/hdmi/add_logical_address",
+    "$schema": "https://json-schema.org/draft/2020-12/schema",
+    "description": "Start acknowledging (ACK) messages sent to this address",
+    "type": "object",
+    "properties": {
+        "address": {
+          "type": "integer",
+        }
+    },
+    "required": [
+        "address",
+    ],
+    "additionalProperties": false
+}
+```
+```
+{
+    "$id": "http://vizio.com/platform/v1.0/controller/hdmi/forget_logical_address",
+    "$schema": "https://json-schema.org/draft/2020-12/schema",
+    "description": "After this call, the device will strictly act as a follower (or remain silent) and will no longer acknowledge messages directed to the <address>",
+    "type": "object",
+    "properties": {
+        "address": {
+          "type": "integer",
+        }
+    },
+    "required": [
+        "address",
+    ],
+    "additionalProperties": false
+}
+```
+```
+{
+    "$id": "http://vizio.com/platform/v1.0/controller/hdmi/send_cec_message",
+    "$schema": "https://json-schema.org/draft/2020-12/schema",
+    "description": "Transmits a CEC message to the bus",
+    "type": "object",
+    "properties": {
+        "src": {
+          "type": "integer",
+        },
+        "dst": {
+          "type": "integer",
+        }
+        "body": {
+          "type": "string",
+          "description": "The raw byte array containing the opcode and operands"
+        }
+    },
+    "required": [
+        "src",
+        "dst",
+        "body"
+    ],
+    "additionalProperties": false
+}
+```
