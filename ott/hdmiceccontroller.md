@@ -270,6 +270,23 @@ Match content:
         "dst": {
           "type": "integer",
         }
+    
+        "optcode": {
+          "type": "string",
+          "enum": [
+             "ACTIVE_SOURCE", //  The "I am here!" command - instructing the TV and AVR to switch to the OTT device's HDMI input. 
+             "IMAGE_VIEW_ON", // Sent to wake up the TV and ensure it is ready to display the OTT device's output
+             "INACTIVE_SOURCE" // Sent when the OTT device goes to sleep 
+             "STANDBY" // Sent to put other devices (TV, AVR) into standby mode,
+             
+             "SET_OSD_NAME" // Sends the name of the device (e.g., "Vizio TV") to be displayed on the TV's input list
+             "USER_CONTROL_PRESSED" // Sent if the OTT remote controls the TV volume or power directly via CEC
+             "USER_CONTROL_RELEASE"
+             "VENDOR_COMMAND"
+             "VENDOR_COMMAND_WITH_ID"
+             "GET_MENU_LANGUAGE" //  Asks the TV for its set language to automatically match the OTT UI language.
+          ]
+        },
         "body": {
           "type": "string",
           "description": "The raw byte array containing the opcode and operands"
