@@ -30,13 +30,17 @@ To demonstrate the complexity of the HDMI-CEC feature, the complete Android HDMI
 4. **RoutingControlAction.java** (126 lines): Managing input switching to suspend the OTT device whenever a user transitions to Vizio Home/other inputs.
 5. **VolumeControlAction.java** (209 lines): Sending/Receiving Vol+/Vol- commands.
 
-The main complexity stems from the slow, unreliable nature of the CEC bus and interoperability issues across vendors like Samsung, LG, Sony, Vizio, and Philips. However, with the available architecture and handling examples, achieving a working solution is simply a matter of technical execution and unlimited AI tokens.
+The main complexity stems from the slow, unreliable nature of the CEC bus and interoperability issues across vendors like Samsung, LG, Sony, Vizio, and Philips.
 
-##### **Vizio HDMI-CEC stack**
-hal-cec problems:
+##### **Vizio HDMI-CEC stack (current)**
+The existing Vizio HAL requires reimplementation to support OTT device. Furthermore, the current architecture lacks scalability and risks delaying time-to-market because the HDMI-CEC core logic resides in the HAL layer rather than the service (controller). This design implies that onboarding new vendors will be time-consuming, as they must implement a complex set of APIs. Additionally, specific vendor implementations may introduce subtle bugs, causing behavior to vary between SoCs. This inconsistency significantly increases maintenance costs and poses a risk to ViziOS stability.
+For example, it is a well-known fact that the HAL differs for every new SoC. Therefore, if there are five vendors, there will be five distinct HAL-CEC implementations, each of which could introduce its own bug.
+
+###### HAL-CEC review
 1. Broken Abstraction & Coupling: The platform driver bypasses the intended hardware interface and directly implements the high-level service contract, while also relying on a global singleton to find itself during callbacks, making the code fragile and impossible to test in isolation.
 2. System Freeze Risk: The hardware driver performs synchronous sleep operations (up to ~1.2 seconds) on the main event thread when the bus is busy, which will block the entire service, causing unresponsiveness and potential timeouts.
 3. To reuse this codebase for OTT, rewriting is necessary. However, achieving robust interoperability will still be difficult, as the current implementation relies on a proprietary custom architecture instead of the standard AOSP flow.
+    1. For example, the Android codebase includes logic to handle specific interoperability issues. In the case of Samsung TVs, the system must send the `ACTIVE_SOURCE` and `IMAGE_VIEW_ON` commands three times to successfully wake the device and switch inputs. Similar vendor-specific workarounds are implemented for all major TV manufacturers. Years of debugging and industry knowledge are already embedded within the AOSP solution. Choosing a custom implementation over the proven AOSP stack is a risky endeavor.
 
 ###### API contract between Controller and HAL-CEC
 1. Requests (Controller -> HAL):
@@ -135,9 +139,7 @@ Android separates these functions: the controller manages protocol parsing and m
         *   Expected Behavior: Enable or disable the electrical ARC pins on the specified HDMI port.
     
     
-##### **Vizio HAL-VSL API (new stack)**
-The existing Vizio HAL requires reimplementation to support OTT device. Furthermore, the current architecture lacks scalability and risks delaying time-to-market because the HDMI-CEC core logic resides in the HAL layer rather than the service (controller). This design implies that onboarding new vendors will be time-consuming, as they must implement a complex set of APIs. Additionally, specific vendor implementations may introduce subtle bugs, causing behavior to vary between SoCs. This inconsistency significantly increases maintenance costs and poses a risk to ViziOS stability.
-
+##### **Vizio HAL-VSL API (proposed)**
 Adopting an architecture that mimics the AOSP HDMI-CEC stack provides a proven, scalable foundation supported by all major vendors. This strategy avoids the pitfalls often associated with custom implementations. Although this requires handling complex management logic, the AOSP codebase serves as a reliable reference, ensuring the system behaves predictably across different SoCs
     
 ###### **VSL API**
