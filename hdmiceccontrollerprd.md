@@ -17,7 +17,6 @@ To demonstrate the complexity of the HDMI-CEC feature, the complete Android HDMI
 2.  **HdmiCecLocalDeviceTv.java** (1,822 lines): Logic specific to TVs (System Audio control, ARC handling).
 3.  **HdmiCecLocalDevice.java** (1,551 lines): Base class for all devices.
 4.  **HdmiCecLocalDeviceAudioSystem.java** (1,402 lines): Logic for Soundbars/AVRs.
-test
 
 ###### Protocol layer
 1. **HdmiCecMessageValidator.java** (1,194 lines): Ensures outgoing messages are spec-compliant.
